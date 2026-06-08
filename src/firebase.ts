@@ -79,7 +79,8 @@ export const SEED_CONFIG: PortalConfig = {
   authorName: "Carolina S. Mendes",
   welcomeTitle: "Espaço do Leitor: Um Presente Para Você",
   welcomeMessage: "Criamos este portal exclusivo como um abraço em cada um de nossos leitores. Aqui reunimos as ilustrações que traduzem em cores a doçura desta jornada apaixonante do jovem casal, a dor das tentativas, o milagre da gestação gemelar e a força inabalável dos laços de amizade. Sinta-se em casa e mergulhe em nossas memórias ilustradas.",
-  romanticDedicatory: "Dedicado a todos aqueles que guardam a paciência no peito e acreditam na beleza dos milagres cotidianos."
+  romanticDedicatory: "Dedicado a todos aqueles que guardam a paciência no peito e acreditam na beleza dos milagres cotidianos.",
+  backgroundMusicUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Fr%C3%A9d%C3%A9ric_Chopin_-_nocturne_in_e-flat_major%2C_op._9_no._2_-_remastered.mp3"
 };
 
 export const SEED_CHAPTERS: Chapter[] = [
@@ -135,42 +136,66 @@ export const SEED_CHAPTERS: Chapter[] = [
   }
 ];
 
-// Read global Portal Settings from Firestore
+// Read global Portal Settings from Firestore with LocalStorage resilient fallback
 export async function getPortalSettings(): Promise<PortalConfig> {
   const docPath = `${SETTINGS_COLLECTION}/global`;
   try {
     const docSnap = await getDoc(doc(db, SETTINGS_COLLECTION, "global"));
     if (docSnap.exists()) {
-      return docSnap.data() as PortalConfig;
+      const data = docSnap.data() as PortalConfig;
+      // Sync cache
+      try {
+        localStorage.setItem("cache_portalSettings_global", JSON.stringify(data));
+      } catch (cacheErr) {
+        console.warn("Could not save to localStorage cache:", cacheErr);
+      }
+      return data;
     } else {
       // Seed initial data if blank so there is no empty UI
       await savePortalSettings(SEED_CONFIG);
       return SEED_CONFIG;
     }
   } catch (err) {
-    handleFirestoreError(err, OperationType.GET, docPath);
+    console.warn("Firestore offline or unreachable. Using localStorage/SEED fallback for settings: ", err);
+    try {
+      const cached = localStorage.getItem("cache_portalSettings_global");
+      if (cached) {
+        return JSON.parse(cached) as PortalConfig;
+      }
+    } catch (cacheErr) {
+      console.warn("Failed to retrieve config from localStorage cache:", cacheErr);
+    }
     return SEED_CONFIG;
   }
 }
 
-// Write/Save Portal Settings to Firestore
+// Write/Save Portal Settings to Firestore and local cache
 export async function savePortalSettings(settings: PortalConfig): Promise<void> {
   const docPath = `${SETTINGS_COLLECTION}/global`;
+  const dataToSave = {
+    bookTitle: settings.bookTitle.trim(),
+    authorName: settings.authorName.trim(),
+    welcomeTitle: settings.welcomeTitle.trim(),
+    welcomeMessage: settings.welcomeMessage.trim(),
+    romanticDedicatory: settings.romanticDedicatory.trim(),
+    backgroundMusicUrl: (settings.backgroundMusicUrl || "").trim()
+  };
+
+  // Always keep localStorage updated
   try {
-    const dataToSave = {
-      bookTitle: settings.bookTitle.trim(),
-      authorName: settings.authorName.trim(),
-      welcomeTitle: settings.welcomeTitle.trim(),
-      welcomeMessage: settings.welcomeMessage.trim(),
-      romanticDedicatory: settings.romanticDedicatory.trim(),
-    };
+    localStorage.setItem("cache_portalSettings_global", JSON.stringify(dataToSave));
+  } catch (cacheErr) {
+    console.warn("Could not sync saving config to localStorage cache:", cacheErr);
+  }
+
+  try {
     await setDoc(doc(db, SETTINGS_COLLECTION, "global"), dataToSave);
   } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, docPath);
+    console.warn("Firestore error in savePortalSettings. Settings saved only to local cache: ", err);
   }
 }
 
-// Read Chapters collection ordered by chapter number
+// Read Chapters collection ordered by chapter number with LocalStorage resilient fallback
 export async function getChapters(): Promise<Chapter[]> {
   const collectionPath = CHAPTERS_COLLECTION;
   try {
@@ -189,40 +214,84 @@ export async function getChapters(): Promise<Chapter[]> {
       return SEED_CHAPTERS;
     }
 
+    // Sync cache
+    try {
+      localStorage.setItem("cache_chapters", JSON.stringify(results));
+    } catch (cacheErr) {
+      console.warn("Could not save chapters to localStorage cache:", cacheErr);
+    }
     return results;
   } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, collectionPath);
+    console.warn("Firestore offline or unreachable. Using localStorage/SEED fallback for chapters: ", err);
+    try {
+      const cached = localStorage.getItem("cache_chapters");
+      if (cached) {
+        return JSON.parse(cached) as Chapter[];
+      }
+    } catch (cacheErr) {
+      console.warn("Failed to retrieve chapters from localStorage cache:", cacheErr);
+    }
     return SEED_CHAPTERS;
   }
 }
 
-// Save or Update a single Chapter
+// Save or Update a single Chapter in Firestore and local cache
 export async function saveChapter(chapter: Chapter): Promise<void> {
   const docPath = `${CHAPTERS_COLLECTION}/${chapter.id}`;
+  const dataToSave = {
+    id: chapter.id,
+    number: Number(chapter.number),
+    title: chapter.title.trim(),
+    subtitle: chapter.subtitle.trim(),
+    shortDescription: chapter.shortDescription.trim(),
+    fullStory: chapter.fullStory.trim(),
+    imageUrl: chapter.imageUrl.trim(),
+    romanticQuote: chapter.romanticQuote.trim(),
+  };
+
+  // Sync cache
   try {
-    const dataToSave = {
-      id: chapter.id,
-      number: Number(chapter.number),
-      title: chapter.title.trim(),
-      subtitle: chapter.subtitle.trim(),
-      shortDescription: chapter.shortDescription.trim(),
-      fullStory: chapter.fullStory.trim(),
-      imageUrl: chapter.imageUrl.trim(),
-      romanticQuote: chapter.romanticQuote.trim(),
-    };
+    const cached = localStorage.getItem("cache_chapters");
+    let currentChapters: Chapter[] = cached ? JSON.parse(cached) : [...SEED_CHAPTERS];
+    const idx = currentChapters.findIndex(c => c.id === chapter.id);
+    if (idx >= 0) {
+      currentChapters[idx] = dataToSave;
+    } else {
+      currentChapters.push(dataToSave);
+    }
+    currentChapters.sort((a, b) => a.number - b.number);
+    localStorage.setItem("cache_chapters", JSON.stringify(currentChapters));
+  } catch (cacheErr) {
+    console.warn("Could not sync saving chapter to localStorage cache:", cacheErr);
+  }
+
+  try {
     await setDoc(doc(db, CHAPTERS_COLLECTION, chapter.id), dataToSave);
   } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, docPath);
+    console.warn("Firestore error in saveChapter. Chapter saved only to local cache: ", err);
   }
 }
 
-// Delete a chapter
+// Delete a chapter from Firestore and local cache
 export async function deleteChapter(chapterId: string): Promise<void> {
   const docPath = `${CHAPTERS_COLLECTION}/${chapterId}`;
+
+  // Sync cache
+  try {
+    const cached = localStorage.getItem("cache_chapters");
+    if (cached) {
+      let currentChapters: Chapter[] = JSON.parse(cached);
+      currentChapters = currentChapters.filter(c => c.id !== chapterId);
+      localStorage.setItem("cache_chapters", JSON.stringify(currentChapters));
+    }
+  } catch (cacheErr) {
+    console.warn("Could not sync deleting chapter from localStorage cache:", cacheErr);
+  }
+
   try {
     await deleteDoc(doc(db, CHAPTERS_COLLECTION, chapterId));
   } catch (err) {
-    handleFirestoreError(err, OperationType.DELETE, docPath);
+    console.warn("Firestore error in deleteChapter. Chapter removed only from local cache: ", err);
   }
 }
 

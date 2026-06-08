@@ -15,4 +15,5 @@ export interface PortalConfig {
   welcomeTitle: string;
   welcomeMessage: string;
   romanticDedicatory: string;
+  backgroundMusicUrl?: string;
 }

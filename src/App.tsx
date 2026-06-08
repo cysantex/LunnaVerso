@@ -246,7 +246,7 @@ export default function App() {
       <FloatingParticles />
 
       {/* Sensorial Soundscape integration */}
-      <AmbientSoundscape />
+      <AmbientSoundscape key={config.backgroundMusicUrl || "default"} musicUrl={config.backgroundMusicUrl} />
 
       {/* TOP DECORATIVE FLUID OVERLAY BANNER */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-300 via-gold-200 to-sage-100 z-10" />

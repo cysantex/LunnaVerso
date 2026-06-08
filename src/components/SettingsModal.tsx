@@ -259,6 +259,22 @@ export default function SettingsModal({
                       onChange={(e) => setLocalConfig({ ...localConfig, romanticDedicatory: e.target.value })}
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-neutral-600 uppercase tracking-wider mb-1">
+                      Link de Música de Fundo (MP3)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://exemplo.com/musica.mp3"
+                      className="w-full text-sm px-3 py-2.5 rounded-lg border border-neutral-200 focus:outline-none focus:border-rose-300"
+                      value={localConfig.backgroundMusicUrl || ""}
+                      onChange={(e) => setLocalConfig({ ...localConfig, backgroundMusicUrl: e.target.value })}
+                    />
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Cole um link direto que termine em <strong>.mp3</strong>. Se deixado vazio, o portal usará o belíssimo <em>Nocturne Op. 9 No. 2 de Chopin (Remasterizado)</em> hospedado no Wikimedia Commons.
+                    </p>
+                  </div>
                 </div>
               )}
 
