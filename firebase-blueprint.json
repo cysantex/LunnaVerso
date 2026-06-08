@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "PortalSettings": {
+      "title": "PortalSettings",
+      "description": "Configurações globais de texto do Portal LunnaVerso",
+      "type": "object",
+      "properties": {
+        "bookTitle": {
+          "type": "string",
+          "description": "Título principal do livro"
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Nome da autora do livro"
+        },
+        "welcomeTitle": {
+          "type": "string",
+          "description": "Título do banner de boas-vindas"
+        },
+        "welcomeMessage": {
+          "type": "string",
+          "description": "Texto/Carta de boas-vindas ao leitor"
+        },
+        "romanticDedicatory": {
+          "type": "string",
+          "description": "Frase de dedicatória romântica exibida no rodapé"
+        }
+      },
+      "required": [
+        "bookTitle",
+        "authorName",
+        "welcomeTitle",
+        "welcomeMessage",
+        "romanticDedicatory"
+      ]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "Milestones ou capítulos do livro com ilustrações exclusivas",
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "description": "Número de ordenação do capítulo"
+        },
+        "title": {
+          "type": "string",
+          "description": "Título do capítulo"
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Subtítulo poético"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Resumo rápido exibido no menu"
+        },
+        "fullStory": {
+          "type": "string",
+          "description": "História completa do capítulo para leitura sensorial"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL da ilustração"
+        },
+        "romanticQuote": {
+          "type": "string",
+          "description": "Sitação romântica ou frase de efeito dramático"
+        }
+      },
+      "required": [
+        "number",
+        "title",
+        "subtitle",
+        "shortDescription",
+        "fullStory",
+        "imageUrl",
+        "romanticQuote"
+      ]
+    }
+  },
+  "firestore": {
+    "/portalSettings/{documentId}": {
+      "schema": "PortalSettings",
+      "description": "Coleção com as configurações globais de texto do portal"
+    },
+    "/chapters/{chapterId}": {
+      "schema": "Chapter",
+      "description": "Coleção de capítulos e ilustrações do romance"
+    }
+  }
+}

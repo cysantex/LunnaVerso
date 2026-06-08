@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --color-romantic-50: #fff5f6;
+  --color-romantic-100: #ffebeb;
+  --color-romantic-200: #ffd6d9;
+  --color-romantic-300: #ffb3b9;
+  --color-romantic-400: #ff808b;
+  --color-romantic-500: #f45062;
+  --color-sage-50: #f4f8f6;
+  --color-sage-100: #e5f0ea;
+  --color-gold-200: #fcf1d8;
+  --color-gold-300: #ebd39c;
+  --color-gold-400: #dec076;
+}
+
+/* Customized scrollbar for a smooth experience */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-romantic-50);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-romantic-200);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-romantic-300);
+}
+
+/* Beautiful custom soft glassmorphism card */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dreamy-glow {
+  box-shadow: 0 0 30px rgba(255, 179, 185, 0.25);
+}
+
+/* Floating custom petals */
+@keyframes fall {
+  0% {
+    transform: translateY(-5%) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(105%) rotate(360deg) translateX(40px);
+    opacity: 0;
+  }
+}
+
+.animate-fall {
+  animation: fall 12s linear infinite;
+}
+
+/* Butterfly 3D Wing Flapping Animation */
+@keyframes flap-left {
+  0%, 100% {
+    transform: rotateY(12deg);
+  }
+  50% {
+    transform: rotateY(72deg);
+  }
+}
+
+@keyframes flap-right {
+  0%, 100% {
+    transform: rotateY(-12deg);
+  }
+  50% {
+    transform: rotateY(-72deg);
+  }
+}
+
+/* Erractic fluttering oscillation simulating real butterfly flight biology */
+@keyframes butterfly-flutter-wobble {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-4deg);
+  }
+  20% {
+    transform: translate(8px, -6px) rotate(6deg);
+  }
+  40% {
+    transform: translate(-6px, -12px) rotate(-8deg);
+  }
+  60% {
+    transform: translate(10px, -4px) rotate(5deg);
+  }
+  80% {
+    transform: translate(-4px, -8px) rotate(-3deg);
+  }
+}
+
+/* Butterfly Floating & Fluttering Path going upwards and sideways */
+@keyframes butterfly-float {
+  0% {
+    transform: translateY(110vh) translateX(0) scale(0.65);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-20vh) translateX(180px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.butterfly-container {
+  position: absolute;
+  pointer-events: none;
+  animation: butterfly-float 24s ease-in-out infinite;
+  perspective: 1000px;
+}
+
+.butterfly {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  transform-style: preserve-3d;
+  animation: butterfly-flutter-wobble 4.5s ease-in-out infinite;
+}
+
+.butterfly-wing-left {
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 30px;
+  height: 40px;
+  transform-origin: right center;
+  animation: flap-left 0.24s ease-in-out infinite;
+}
+
+.butterfly-wing-right {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 30px;
+  height: 40px;
+  transform-origin: left center;
+  animation: flap-right 0.24s ease-in-out infinite;
+}
+
+

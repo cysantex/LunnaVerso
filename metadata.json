@@ -1,0 +1,6 @@
+{
+  "name": "Portal de Ilustrações do Livro",
+  "description": "Um portal romântico interativo em tons pastéis com ilustrações exclusivas e efeitos especiais para os leitores do livro sobre a jornada do jovem casal, sua gravidez de gêmeos e o amor de seus amigos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

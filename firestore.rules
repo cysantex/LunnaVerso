@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default system-wide deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // portalSettings validation helper
+    function isValidPortalSettings(data) {
+      return data.keys().hasAll(['bookTitle', 'authorName', 'welcomeTitle', 'welcomeMessage', 'romanticDedicatory'])
+        && data.keys().size() == 5
+        && data.bookTitle is string && data.bookTitle.size() <= 150
+        && data.authorName is string && data.authorName.size() <= 100
+        && data.welcomeTitle is string && data.welcomeTitle.size() <= 200
+        && data.welcomeMessage is string && data.welcomeMessage.size() <= 2000
+        && data.romanticDedicatory is string && data.romanticDedicatory.size() <= 500;
+    }
+
+    // Chapter validation helper
+    function isValidChapter(data) {
+      return data.keys().hasAll(['number', 'title', 'subtitle', 'shortDescription', 'fullStory', 'imageUrl', 'romanticQuote', 'id'])
+        && data.keys().size() == 8
+        && data.id is string && data.id.size() <= 128
+        && data.number is int
+        && data.title is string && data.title.size() <= 150
+        && data.subtitle is string && data.subtitle.size() <= 250
+        && data.shortDescription is string && data.shortDescription.size() <= 500
+        && data.fullStory is string && data.fullStory.size() <= 4000
+        && data.imageUrl is string && data.imageUrl.size() <= 1000
+        && data.romanticQuote is string && data.romanticQuote.size() <= 500;
+    }
+
+    match /portalSettings/{documentId} {
+      allow read: if true;
+      allow create, update: if isValidId(documentId) && isValidPortalSettings(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /chapters/{chapterId} {
+      allow read: if true;
+      allow create, update: if isValidId(chapterId) && isValidChapter(request.resource.data);
+      allow delete: if true;
+    }
+  }
+}
