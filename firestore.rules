@@ -14,13 +14,14 @@ service cloud.firestore {
 
     // portalSettings validation helper
     function isValidPortalSettings(data) {
-      return data.keys().hasAll(['bookTitle', 'authorName', 'welcomeTitle', 'welcomeMessage', 'romanticDedicatory'])
-        && data.keys().size() == 5
-        && data.bookTitle is string && data.bookTitle.size() <= 150
-        && data.authorName is string && data.authorName.size() <= 100
-        && data.welcomeTitle is string && data.welcomeTitle.size() <= 200
-        && data.welcomeMessage is string && data.welcomeMessage.size() <= 2000
-        && data.romanticDedicatory is string && data.romanticDedicatory.size() <= 500;
+      return data.keys().hasAll(['bookTitle', 'authorName', 'welcomeTitle', 'welcomeMessage', 'romanticDedicatory', 'backgroundMusicUrl'])
+        && data.keys().size() == 6
+        && data.bookTitle is string && data.bookTitle.size() <= 300
+        && data.authorName is string && data.authorName.size() <= 200
+        && data.welcomeTitle is string && data.welcomeTitle.size() <= 400
+        && data.welcomeMessage is string && data.welcomeMessage.size() <= 8000
+        && data.romanticDedicatory is string && data.romanticDedicatory.size() <= 1000
+        && data.backgroundMusicUrl is string && data.backgroundMusicUrl.size() <= 1500;
     }
 
     // Chapter validation helper
@@ -29,12 +30,12 @@ service cloud.firestore {
         && data.keys().size() == 8
         && data.id is string && data.id.size() <= 128
         && data.number is int
-        && data.title is string && data.title.size() <= 150
-        && data.subtitle is string && data.subtitle.size() <= 250
-        && data.shortDescription is string && data.shortDescription.size() <= 500
-        && data.fullStory is string && data.fullStory.size() <= 4000
-        && data.imageUrl is string && data.imageUrl.size() <= 1000
-        && data.romanticQuote is string && data.romanticQuote.size() <= 500;
+        && data.title is string && data.title.size() <= 300
+        && data.subtitle is string && data.subtitle.size() <= 500
+        && data.shortDescription is string && data.shortDescription.size() <= 1000
+        && data.fullStory is string && data.fullStory.size() <= 12000
+        && data.imageUrl is string && data.imageUrl.size() <= 2000
+        && data.romanticQuote is string && data.romanticQuote.size() <= 1000;
     }
 
     match /portalSettings/{documentId} {

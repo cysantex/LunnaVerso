@@ -24,6 +24,10 @@
         "romanticDedicatory": {
           "type": "string",
           "description": "Frase de dedicatória romântica exibida no rodapé"
+        },
+        "backgroundMusicUrl": {
+          "type": "string",
+          "description": "Link de Música de Fundo (MP3)"
         }
       },
       "required": [
@@ -31,7 +35,8 @@
         "authorName",
         "welcomeTitle",
         "welcomeMessage",
-        "romanticDedicatory"
+        "romanticDedicatory",
+        "backgroundMusicUrl"
       ]
     },
     "Chapter": {

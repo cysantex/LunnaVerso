@@ -191,7 +191,7 @@ export async function savePortalSettings(settings: PortalConfig): Promise<void> 
   try {
     await setDoc(doc(db, SETTINGS_COLLECTION, "global"), dataToSave);
   } catch (err) {
-    console.warn("Firestore error in savePortalSettings. Settings saved only to local cache: ", err);
+    handleFirestoreError(err, OperationType.WRITE, docPath);
   }
 }
 
@@ -268,7 +268,7 @@ export async function saveChapter(chapter: Chapter): Promise<void> {
   try {
     await setDoc(doc(db, CHAPTERS_COLLECTION, chapter.id), dataToSave);
   } catch (err) {
-    console.warn("Firestore error in saveChapter. Chapter saved only to local cache: ", err);
+    handleFirestoreError(err, OperationType.WRITE, docPath);
   }
 }
 
@@ -291,7 +291,7 @@ export async function deleteChapter(chapterId: string): Promise<void> {
   try {
     await deleteDoc(doc(db, CHAPTERS_COLLECTION, chapterId));
   } catch (err) {
-    console.warn("Firestore error in deleteChapter. Chapter removed only from local cache: ", err);
+    handleFirestoreError(err, OperationType.DELETE, docPath);
   }
 }
 
