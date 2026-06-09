@@ -404,24 +404,24 @@ export default function App() {
                     {/* Floating soft color blob behind image to enhance watercolor mood */}
                     <div className="absolute inset-0 bg-radial-gradient from-rose-200/40 via-amber-100/10 to-transparent blur-xl pointer-events-none" />
 
-                    {/* The main active romantic image with dreamy watercolor soft transition */}
+                    {/* Ambient blurred backdrop of the same image to eliminate letterbox empty gaps elegantly */}
+                    <img
+                      src={getDirectImageUrl(selectedChapter.imageUrl)}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 select-none scale-105 pointer-events-none"
+                    />
+
+                    {/* The main active romantic image, fitting cleanly without cropping */}
                     <img
                       key={selectedChapter.id}
                       src={getDirectImageUrl(selectedChapter.imageUrl)}
                       alt={selectedChapter.title}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-all duration-1000 scale-100 group-hover:scale-105 filter saturate-[0.9] sepia-[0.05] brightness-[1.02]"
+                      className="relative z-10 w-full h-full object-contain transition-all duration-1000 scale-100 group-hover:scale-[1.02] filter saturate-[0.95] sepia-[0.02] brightness-[1.01]"
                     />
 
                     {/* Dynamic corner ornaments */}
-                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-sans font-semibold tracking-widest text-neutral-500 uppercase shadow-sm border border-white/60">
-                      Capítulo 0{selectedChapter.number}
-                    </div>
-
-                    <div className="absolute bottom-3 right-3 px-3.5 py-1.5 bg-rose-500/95 text-white backdrop-blur-md rounded-full text-xs font-serif italic tracking-wide flex items-center gap-1 shadow-md">
-                      <Heart className="h-3 w-3 fill-white text-transparent animate-pulse" />
-                      Momentos de Amor
-                    </div>
                   </div>
 
                   {/* STORYBOARD TITLES */}
