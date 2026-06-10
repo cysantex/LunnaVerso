@@ -80,7 +80,7 @@ export const SEED_CONFIG: PortalConfig = {
   welcomeTitle: "Espaço do Leitor: Um Presente Para Você",
   welcomeMessage: "Criamos este portal exclusivo como um abraço em cada um de nossos leitores. Aqui reunimos as ilustrações que traduzem em cores a doçura desta jornada apaixonante do jovem casal, a dor das tentativas, o milagre da gestação gemelar e a força inabalável dos laços de amizade. Sinta-se em casa e mergulhe em nossas memórias ilustradas.",
   romanticDedicatory: "Dedicado a todos aqueles que guardam a paciência no peito e acreditam na beleza dos milagres cotidianos.",
-  backgroundMusicUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Fr%C3%A9d%C3%A9ric_Chopin_-_nocturne_in_e-flat_major%2C_op._9_no._2_-_remastered.mp3"
+  backgroundMusicUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Erik_Satie_-_Gymnop%C3%A9dies_-_No._1.mp3"
 };
 
 export const SEED_CHAPTERS: Chapter[] = [
