@@ -246,7 +246,7 @@ export default function App() {
       <FloatingParticles />
 
       {/* Sensorial Soundscape integration */}
-      <AmbientSoundscape key={config.backgroundMusicUrl || "default"} musicUrl={config.backgroundMusicUrl} />
+      <AmbientSoundscape musicUrl={config.backgroundMusicUrl} />
 
       {/* TOP DECORATIVE FLUID OVERLAY BANNER */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-300 via-gold-200 to-sage-100 z-10" />
@@ -504,11 +504,7 @@ export default function App() {
           </p>
 
           <div className="mt-5 flex justify-center gap-1.5 items-center text-[11px] text-neutral-400 uppercase tracking-widest font-sans font-medium">
-            <span>Amor</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-200" />
-            <span>Família</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-200" />
-            <span>Esperança</span>
+            <span>Lunna Balduíno</span>
           </div>
         </section>
 
