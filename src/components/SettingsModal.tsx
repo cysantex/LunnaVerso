@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, Save, RotateCcw, Settings, Plus, Edit2, Trash2, BookOpen, Layers } from "lucide-react";
 import { Chapter, PortalConfig } from "../types";
-import { triggerStarChime } from "./AmbientSoundscape";
+import { triggerStarChime, MUSIC_PRESETS } from "./AmbientSoundscape";
 import { getDirectImageUrl } from "../firebase";
 
 interface SettingsModalProps {
@@ -260,20 +260,56 @@ export default function SettingsModal({
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-600 uppercase tracking-wider mb-1">
-                      Link de Música de Fundo (MP3)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="https://exemplo.com/musica.mp3"
-                      className="w-full text-sm px-3 py-2.5 rounded-lg border border-neutral-200 focus:outline-none focus:border-rose-300"
-                      value={localConfig.backgroundMusicUrl || ""}
-                      onChange={(e) => setLocalConfig({ ...localConfig, backgroundMusicUrl: e.target.value })}
-                    />
-                    <p className="text-[10px] text-neutral-400 mt-1">
-                      Cole um link direto que termine em <strong>.mp3</strong>. Se deixado vazio, o portal usará o belíssimo <em>Nocturne Op. 9 No. 2 de Chopin (Remasterizado)</em> hospedado no Wikimedia Commons.
-                    </p>
+                   <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-neutral-600 uppercase tracking-wider mb-2.5">
+                        Trilhas Sonoras Recomendadas (Suaves & Dramáticas)
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3.5">
+                        {MUSIC_PRESETS.map((track) => {
+                          const isActive = localConfig.backgroundMusicUrl === track.url || 
+                            ((!localConfig.backgroundMusicUrl || localConfig.backgroundMusicUrl.trim() === "") && track.id === "satie-gymnopedie");
+                          return (
+                            <button
+                              key={track.id}
+                              type="button"
+                              onClick={() => {
+                                setLocalConfig({ ...localConfig, backgroundMusicUrl: track.url });
+                                triggerStarChime();
+                              }}
+                              className={`flex flex-col text-left p-3.5 rounded-xl border transition-all active:scale-98 ${
+                                isActive 
+                                  ? "bg-rose-50/70 border-rose-200 text-rose-800 shadow-sm" 
+                                  : "border-neutral-100 hover:border-neutral-200 hover:bg-neutral-50/50 bg-white"
+                              }`}
+                            >
+                              <span className="text-xs font-bold">{track.name}</span>
+                              <span className="text-[10px] text-neutral-400 mt-0.5 font-medium">Melodia por {track.composer}</span>
+                              <div className="mt-2 flex items-center justify-between w-full text-[9.5px] font-semibold text-rose-500/90">
+                                <span>{track.vibe}</span>
+                                {isActive && <span className="bg-rose-100/80 text-rose-700 px-2 py-0.5 rounded-full text-[8.5px]">Ativa</span>}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-neutral-600 uppercase tracking-wider mb-1">
+                        Ou insira um link de áudio personalizado
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://exemplo.com/musica.mp3"
+                        className="w-full text-sm px-3 py-2.5 rounded-lg border border-neutral-200 focus:outline-none focus:border-rose-300"
+                        value={localConfig.backgroundMusicUrl || ""}
+                        onChange={(e) => setLocalConfig({ ...localConfig, backgroundMusicUrl: e.target.value })}
+                      />
+                      <p className="text-[10px] text-neutral-400 mt-1.5 leading-normal">
+                        Sugerimos selecionar um dos nossos presets clássicos otimizados. Se preferir um arquivo próprio, cole um link direto terminado em <strong>.mp3</strong> ou <strong>.ogg</strong> (como do Pixabay Música). Links de páginas como YouTube ou Spotify não funcionam como reprodutor de áudio direto.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
