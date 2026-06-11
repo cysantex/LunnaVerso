@@ -7,6 +7,7 @@ export interface Chapter {
   fullStory: string;
   imageUrl: string;
   romanticQuote: string;
+  isGrayscale?: boolean;
 }
 
 export interface PortalConfig {

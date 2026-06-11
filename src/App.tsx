@@ -114,6 +114,99 @@ export default function App() {
   const [isExcerptExpanded, setIsExcerptExpanded] = useState(false);
   const [hasSoundAlert, setHasSoundAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [revealSparkles, setRevealSparkles] = useState<{ id: number; x: number; y: number; delay: number; color: string; size: number; shape: string }[]>([]);
+
+  // Keep browser tab title synchronized with the configured Book Title
+  useEffect(() => {
+    if (config?.bookTitle) {
+      document.title = config.bookTitle;
+    }
+  }, [config?.bookTitle]);
+
+  // Reset image color reveal state whenever transitioning to a different milestone
+  useEffect(() => {
+    setIsRevealed(false);
+    setRevealSparkles([]);
+  }, [selectedChapter?.id]);
+
+  // Spawn visual sparkles when sensory reveal occurs
+  useEffect(() => {
+    if (isRevealed && selectedChapter?.isGrayscale) {
+      const colors = [
+        "#f43f5e", // Rose
+        "#ff6b81", // Warm Coral-pink
+        "#fb7185", // Bright rose
+        "#fbcfe8", // Magenta pink
+        "#fbbf24", // Gold
+        "#fef08a", // Soft light yellow
+        "#38bdf8", // Sky blue
+        "#a78bfa", // Purple lavender
+        "#34d399", // Mint emerald
+        "#ff9f43"  // Cream orange
+      ];
+      const shapes = ["circle", "star-four", "star-empty", "heart"];
+      const count = 55; // High-density magical bursts!
+      const newSparkles = Array.from({ length: count }).map((_, i) => {
+        const angle = (i * (360 / count)) + (Math.random() * 24 - 12);
+        
+        // Random distance in pixels from center (from 40px near center to 340px outer boundaries)
+        const distance = 40 + Math.random() * 290;
+        const rad = (angle * Math.PI) / 180;
+        const x = Math.cos(rad) * distance;
+        const y = Math.sin(rad) * distance;
+        
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = 10 + Math.random() * 16; // sizes from 10px to 26px
+        const delay = Math.random() * 450; // smooth staggering Delay up to 450ms
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        
+        return {
+          id: Date.now() + i + Math.random(),
+          x,
+          y,
+          color,
+          size,
+          delay,
+          shape
+        };
+      });
+      setRevealSparkles(newSparkles);
+    } else {
+      setRevealSparkles([]);
+    }
+  }, [isRevealed, selectedChapter]);
+
+  // Global document click event listener for the magical color reveal effect
+  useEffect(() => {
+    const handleGlobalClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target) return;
+
+      // Ignore if user clicks on buttons, inputs, textareas, links, or within the Settings modal wrapper,
+      // to prevent unwanted accidental triggers when interacting with controls or panels
+      if (
+        target.closest("button") ||
+        target.closest("input") ||
+        target.closest("textarea") ||
+        target.closest("a") ||
+        target.closest(".settings-modal-overlay") ||
+        target.closest("[role='dialog']")
+      ) {
+        return;
+      }
+
+      if (selectedChapter?.isGrayscale && !isRevealed) {
+        setIsRevealed(true);
+        triggerStarChime();
+      }
+    };
+
+    document.addEventListener("click", handleGlobalClick);
+    return () => {
+      document.removeEventListener("click", handleGlobalClick);
+    };
+  }, [selectedChapter, isRevealed]);
 
   // Sync to Firestore on mount
   useEffect(() => {
@@ -405,24 +498,144 @@ export default function App() {
                     <div className="absolute inset-0 bg-radial-gradient from-rose-200/40 via-amber-100/10 to-transparent blur-xl pointer-events-none" />
 
                     {/* Ambient blurred backdrop of the same image to eliminate letterbox empty gaps elegantly */}
-                    <img
-                      src={getDirectImageUrl(selectedChapter.imageUrl)}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                      className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 select-none scale-105 pointer-events-none"
-                    />
+                    {selectedChapter.isGrayscale ? (
+                      <>
+                        <img
+                          src={getDirectImageUrl(selectedChapter.imageUrl)}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 select-none scale-105 pointer-events-none filter grayscale contrast-[1.1]"
+                        />
+                        <img
+                          src={getDirectImageUrl(selectedChapter.imageUrl)}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          className={`absolute inset-0 w-full h-full object-cover blur-md select-none scale-105 pointer-events-none filter grayscale-0 transition-opacity duration-[2200ms] ease-out ${
+                            isRevealed ? "opacity-30" : "opacity-0"
+                          }`}
+                        />
+                      </>
+                    ) : (
+                      <img
+                        src={getDirectImageUrl(selectedChapter.imageUrl)}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 select-none scale-105 pointer-events-none"
+                      />
+                    )}
 
-                    {/* The main active romantic image, fitting cleanly without cropping */}
-                    <img
-                      key={selectedChapter.id}
-                      src={getDirectImageUrl(selectedChapter.imageUrl)}
-                      alt={selectedChapter.title}
-                      referrerPolicy="no-referrer"
-                      className="relative z-10 w-full h-full object-contain transition-all duration-1000 scale-100 group-hover:scale-[1.02] filter saturate-[0.95] sepia-[0.02] brightness-[1.01]"
-                    />
+                    {/* Main illustration: Base static copy (Grayscale fallback behind the color sweep) */}
+                    {selectedChapter.isGrayscale ? (
+                      <>
+                        {/* Gray base layer that acts as layout anchor size */}
+                        <img
+                          key={`gray-base-${selectedChapter.id}`}
+                          src={getDirectImageUrl(selectedChapter.imageUrl)}
+                          alt={selectedChapter.title}
+                          referrerPolicy="no-referrer"
+                          className="relative z-10 w-full h-full object-contain filter grayscale contrast-[1.1] brightness-[0.96] select-none"
+                        />
+
+                        {/* Precise color sweep overlay layer */}
+                        <img
+                          key={`color-reveal-${selectedChapter.id}`}
+                          src={getDirectImageUrl(selectedChapter.imageUrl)}
+                          alt={selectedChapter.title}
+                          referrerPolicy="no-referrer"
+                          className={`absolute inset-0 w-full h-full object-contain pointer-events-none select-none ${
+                            isRevealed ? "z-20 scale-100 group-hover:scale-[1.02]" : "z-10"
+                          }`}
+                          style={{
+                            clipPath: isRevealed ? "circle(150% at 50% 50%)" : "circle(0% at 50% 50%)",
+                            transition: "clip-path 2600ms cubic-bezier(0.1, 0.8, 0.15, 1), transform 1200ms cubic-bezier(0.16, 1, 0.3, 1), filter 2600ms ease-out",
+                            filter: isRevealed 
+                              ? "grayscale(0) saturate(1.15) sepia(0.01) brightness(1.02)" 
+                              : "grayscale(1) contrast(1.1) brightness(0.96)"
+                          }}
+                        />
+                      </>
+                    ) : (
+                      /* Perfect relative colored image for standard chapters with normal scale styles */
+                      <img
+                        key={`normal-${selectedChapter.id}`}
+                        src={getDirectImageUrl(selectedChapter.imageUrl)}
+                        alt={selectedChapter.title}
+                        referrerPolicy="no-referrer"
+                        className="relative z-10 w-full h-full object-contain transition-all duration-1000 scale-100 group-hover:scale-[1.02] filter saturate-[1.05] sepia-[0.01] brightness-[1.01]"
+                      />
+                    )}
+
+                    {/* Concentric magical shockwaves of color reveal */}
+                    {isRevealed && selectedChapter.isGrayscale && (
+                      <>
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed pointer-events-none z-30 animate-shockwave-1" />
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-double pointer-events-none z-30 animate-shockwave-2" />
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full border border-dotted pointer-events-none z-30 animate-shockwave-3" />
+                      </>
+                    )}
+
+                    {/* Sensory floating sparkles explosion overlay inside the frame bounding box */}
+                    {revealSparkles.map((sp) => {
+                      if (sp.shape === "circle") {
+                        return (
+                          <div
+                            key={sp.id}
+                            className="absolute rounded-full pointer-events-none z-30"
+                            style={{
+                              left: "50%",
+                              top: "50%",
+                              width: `${sp.size}px`,
+                              height: `${sp.size}px`,
+                              backgroundColor: sp.color,
+                              boxShadow: `0 0 ${sp.size * 1.8}px ${sp.color}, inset 0 0 4px white`,
+                              animation: `magicalBurst 2200ms cubic-bezier(0.15, 0.85, 0.2, 1) forwards`,
+                              animationDelay: `${sp.delay}ms`,
+                              transform: "translate(-50%, -50%)",
+                              ["--target-x" as any]: `${sp.x}px`,
+                              ["--target-y" as any]: `${sp.y}px`,
+                            }}
+                          />
+                        );
+                      }
+
+                      // Render beautiful characters for Stars and Hearts
+                      let symbol = "✦";
+                      if (sp.shape === "star-empty") symbol = "✧";
+                      if (sp.shape === "heart") symbol = "❤";
+
+                      return (
+                        <div
+                          key={sp.id}
+                          className="absolute pointer-events-none z-30 select-none flex items-center justify-center font-serif leading-none"
+                          style={{
+                            left: "50%",
+                            top: "50%",
+                            color: sp.color,
+                            fontSize: `${sp.size * 1.5}px`,
+                            textShadow: `0 0 ${sp.size * 1.2}px ${sp.color}, 0 0 ${sp.size * 2}px ${sp.color}`,
+                            animation: `magicalBurst 2200ms cubic-bezier(0.15, 0.85, 0.2, 1) forwards`,
+                            animationDelay: `${sp.delay}ms`,
+                            transform: "translate(-50%, -50%)",
+                            ["--target-x" as any]: `${sp.x}px`,
+                            ["--target-y" as any]: `${sp.y}px`,
+                          }}
+                        >
+                          {symbol}
+                        </div>
+                      );
+                    })}
 
                     {/* Dynamic corner ornaments */}
                   </div>
+
+                  {selectedChapter.isGrayscale && !isRevealed && (
+                    <div className="mb-4.5 p-3.5 rounded-xl bg-amber-50/50 border border-amber-100/40 text-center animate-[pulse_2s_infinite] shadow-sm">
+                      <p className="text-[11.5px] font-serif italic text-amber-800/90 flex items-center justify-center gap-1.5 font-medium leading-normal">
+                        <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0 animate-spin" style={{ animationDuration: "12s" }} />
+                        Este momento está guardado sob a discrição do tempo... Toque ou clique em qualquer lugar para desvendar suas cores originais!
+                      </p>
+                    </div>
+                  )}
 
                   {/* STORYBOARD TITLES */}
                   <div className="space-y-2 mb-5">

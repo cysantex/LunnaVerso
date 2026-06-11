@@ -71,6 +71,10 @@
         "romanticQuote": {
           "type": "string",
           "description": "Sitação romântica ou frase de efeito dramático"
+        },
+        "isGrayscale": {
+          "type": "boolean",
+          "description": "Indica se a imagem inicia em preto e branco (P&B) para posterior revelação sensorial"
         }
       },
       "required": [

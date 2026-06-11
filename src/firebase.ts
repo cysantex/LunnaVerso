@@ -258,6 +258,7 @@ export async function saveChapter(chapter: Chapter): Promise<void> {
     fullStory: chapter.fullStory.trim(),
     imageUrl: chapter.imageUrl.trim(),
     romanticQuote: chapter.romanticQuote.trim(),
+    isGrayscale: !!chapter.isGrayscale,
   };
 
   // Sync cache

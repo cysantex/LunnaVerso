@@ -107,7 +107,8 @@ export default function SettingsModal({
       shortDescription: "Uma breve descrição literária que resume o momento.",
       fullStory: "Era uma vez... Escreva aqui o conto detalhado desta ilustração do livro.",
       imageUrl: "https://images.unsplash.com/photo-1518199266791-5375a83190b7",
-      romanticQuote: "Insira uma bela citação romântica de destaque para tocar a alma."
+      romanticQuote: "Insira uma bela citação romântica de destaque para tocar a alma.",
+      isGrayscale: false
     };
     setSelectedEditChapterId(newId);
     setLocalChapterForm(newChap);
@@ -167,7 +168,7 @@ export default function SettingsModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-neutral-900/40 backdrop-blur-md flex items-center justify-center p-4 z-[100] animate-[fadeIn_0.2s_ease-out]">
+        <div className="settings-modal-overlay fixed inset-0 bg-neutral-900/40 backdrop-blur-md flex items-center justify-center p-4 z-[100] animate-[fadeIn_0.2s_ease-out]">
           <div className="bg-white/98 max-w-2xl w-full rounded-2xl shadow-2xl border border-rose-100 relative max-h-[85vh] overflow-hidden flex flex-col">
             
             {!isUnlocked ? (
@@ -580,6 +581,24 @@ export default function SettingsModal({
                           value={localChapterForm.fullStory}
                           onChange={(e) => setLocalChapterForm({ ...localChapterForm, fullStory: e.target.value })}
                         />
+                      </div>
+
+                      <div className="flex items-start gap-3.5 p-3.5 bg-rose-50/30 rounded-xl border border-rose-100/50">
+                        <input
+                          id="is-grayscale-checkbox"
+                          type="checkbox"
+                          className="w-4 h-4 text-rose-500 border-neutral-300 rounded focus:ring-rose-500/50 cursor-pointer accent-rose-500 shrink-0 mt-0.5"
+                          checked={!!localChapterForm.isGrayscale}
+                          onChange={(e) => setLocalChapterForm({ ...localChapterForm, isGrayscale: e.target.checked })}
+                        />
+                        <div className="flex-1 select-none">
+                          <label htmlFor="is-grayscale-checkbox" className="text-xs text-neutral-700 font-bold block cursor-pointer">
+                            Aplicar filtro P&B inicial (Sensorial)
+                          </label>
+                          <span className="text-[10.5px] text-neutral-400 mt-0.5 block leading-relaxed font-sans font-normal">
+                            A ilustração aparecerá inicialmente em Preto e Branco. Ela revelará suas cores reais (aquarela original) com um efeito sutil quando o leitor clicar em qualquer lugar da tela!
+                          </span>
+                        </div>
                       </div>
 
                       <div className="flex gap-2 pt-1 justify-end">
