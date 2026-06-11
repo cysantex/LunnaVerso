@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { X, Save, RotateCcw, Settings, Plus, Edit2, Trash2, BookOpen, Layers } from "lucide-react";
 import { Chapter, PortalConfig } from "../types";
 import { triggerStarChime, MUSIC_PRESETS } from "./AmbientSoundscape";
@@ -31,6 +31,11 @@ export default function SettingsModal({
   const [selectedEditChapterId, setSelectedEditChapterId] = useState<string | null>(null);
   const [localChapterForm, setLocalChapterForm] = useState<Chapter | null>(null);
 
+  // Password unlock state for Author/Admin panel
+  const [passwordInput, setPasswordInput] = useState("");
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
   // Loading indicators
   const [isSaving, setIsSaving] = useState(false);
 
@@ -39,8 +44,22 @@ export default function SettingsModal({
     setSelectedEditChapterId(null);
     setLocalChapterForm(null);
     setActiveTab("general");
+    setPasswordInput("");
+    setIsUnlocked(false);
+    setPasswordError("");
     setIsOpen(true);
     triggerStarChime();
+  };
+
+  const handleUnlockSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === "LunnaVerso@1") {
+      setIsUnlocked(true);
+      setPasswordError("");
+      triggerStarChime();
+    } else {
+      setPasswordError("Senha incorreta. Certifique-se de respeitar maiúsculas e minúsculas.");
+    }
   };
 
   const handleSaveGeneral = async () => {
@@ -140,19 +159,85 @@ export default function SettingsModal({
       <button
         id="open-settings-btn"
         onClick={handleOpen}
-        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white hover:bg-rose-50/50 text-neutral-600 hover:text-rose-500 transition-all font-sans text-xs font-semibold border border-neutral-100 hover:border-rose-100 hover:scale-101 shadow-sm cursor-pointer"
-        title="Painel do Autor"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-neutral-400 hover:text-rose-400 hover:bg-rose-50/40 transition-all font-sans text-[11px] font-medium cursor-pointer"
+        title="Painel do Autor (Configurações)"
       >
-        <Settings className="h-4 w-4" />
-        Configuração (LunnaVerso)
+        <Settings className="h-3.5 w-3.5" />
+        Configuração
       </button>
 
       {isOpen && (
         <div className="fixed inset-0 bg-neutral-900/40 backdrop-blur-md flex items-center justify-center p-4 z-[100] animate-[fadeIn_0.2s_ease-out]">
           <div className="bg-white/98 max-w-2xl w-full rounded-2xl shadow-2xl border border-rose-100 relative max-h-[85vh] overflow-hidden flex flex-col">
             
-            {/* Header */}
-            <div className="p-6 pb-4 border-b border-rose-50 flex items-center justify-between">
+            {!isUnlocked ? (
+              <div className="flex flex-col h-full">
+                {/* Header */}
+                <div className="p-6 pb-4 border-b border-rose-50 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-serif text-2xl text-neutral-800 font-medium">Acesso Restrito</h3>
+                    <p className="text-neutral-500 text-xs font-sans mt-0.5">
+                      Esta área é exclusiva para os autores e administradores do LunnaVerso.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition cursor-pointer"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUnlockSubmit} className="p-8 flex flex-col items-center justify-center space-y-5 my-4">
+                  <div className="w-12 h-12 rounded-full bg-rose-50/80 text-rose-500 flex items-center justify-center shadow-inner mb-2 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                  </div>
+
+                  <div className="w-full max-w-sm space-y-2">
+                    <label className="block text-center text-xs font-bold text-neutral-500 uppercase tracking-widest">
+                      Senha do Painel de Edição
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Digite a senha..."
+                      value={passwordInput}
+                      onChange={(e) => {
+                        setPasswordInput(e.target.value);
+                        setPasswordError("");
+                      }}
+                      className="w-full text-center text-sm px-4 py-3 rounded-lg border border-neutral-200 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-300 transition shadow-sm"
+                      autoFocus
+                    />
+                    {passwordError && (
+                      <p className="text-[11px] text-rose-500 text-center font-medium mt-1">
+                        {passwordError}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2.5 pt-4 w-full max-w-sm">
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="flex-1 py-2.5 rounded-lg border border-neutral-200 text-neutral-500 hover:bg-neutral-50 text-xs font-semibold transition cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold rounded-lg shadow-md transition cursor-pointer"
+                    >
+                      Desbloquear
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="p-6 pb-4 border-b border-rose-50 flex items-center justify-between">
               <div>
                 <h3 className="font-serif text-2xl text-neutral-800 font-medium">Bando de Dados LunnaVerso</h3>
                 <p className="text-neutral-500 text-xs font-sans mt-0.5">
@@ -263,12 +348,12 @@ export default function SettingsModal({
                    <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-neutral-600 uppercase tracking-wider mb-2.5">
-                        Trilhas Sonoras Recomendadas (Suaves & Dramáticas)
+                        Trilhas Sonoras Recomendadas (Suaves & Românticas)
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3.5">
                         {MUSIC_PRESETS.map((track) => {
                           const isActive = localConfig.backgroundMusicUrl === track.url || 
-                            ((!localConfig.backgroundMusicUrl || localConfig.backgroundMusicUrl.trim() === "") && track.id === "satie-gymnopedie");
+                            ((!localConfig.backgroundMusicUrl || localConfig.backgroundMusicUrl.trim() === "") && track.id === "chopin-nocturne");
                           return (
                             <button
                               key={track.id}
@@ -557,6 +642,8 @@ export default function SettingsModal({
                 )}
               </div>
             </div>
+              </>
+            )}
 
           </div>
         </div>

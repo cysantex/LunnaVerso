@@ -80,7 +80,7 @@ export const SEED_CONFIG: PortalConfig = {
   welcomeTitle: "Espaço do Leitor: Um Presente Para Você",
   welcomeMessage: "Criamos este portal exclusivo como um abraço em cada um de nossos leitores. Aqui reunimos as ilustrações que traduzem em cores a doçura desta jornada apaixonante do jovem casal, a dor das tentativas, o milagre da gestação gemelar e a força inabalável dos laços de amizade. Sinta-se em casa e mergulhe em nossas memórias ilustradas.",
   romanticDedicatory: "Dedicado a todos aqueles que guardam a paciência no peito e acreditam na beleza dos milagres cotidianos.",
-  backgroundMusicUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Erik_Satie_-_Gymnop%C3%A9dies_-_No._1.mp3"
+  backgroundMusicUrl: "https://raw.githubusercontent.com/yishengc/Chopin/master/mp3/Nocturne-Op9-No2.mp3"
 };
 
 export const SEED_CHAPTERS: Chapter[] = [
@@ -143,6 +143,17 @@ export async function getPortalSettings(): Promise<PortalConfig> {
     const docSnap = await getDoc(doc(db, SETTINGS_COLLECTION, "global"));
     if (docSnap.exists()) {
       const data = docSnap.data() as PortalConfig;
+      
+      // Upgrade existing config to Chopin if set to old Satie track or empty
+      if (!data.backgroundMusicUrl || data.backgroundMusicUrl.includes("Satie") || data.backgroundMusicUrl.includes("satie") || data.backgroundMusicUrl.includes("Gymnop")) {
+        data.backgroundMusicUrl = "https://raw.githubusercontent.com/yishengc/Chopin/master/mp3/Nocturne-Op9-No2.mp3";
+        try {
+          await savePortalSettings(data);
+        } catch (saveErr) {
+          console.warn("Could not auto-migrate backgroundMusicUrl to Chopin:", saveErr);
+        }
+      }
+
       // Sync cache
       try {
         localStorage.setItem("cache_portalSettings_global", JSON.stringify(data));
