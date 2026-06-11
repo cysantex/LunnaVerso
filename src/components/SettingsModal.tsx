@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { X, Save, RotateCcw, Settings, Plus, Edit2, Trash2, BookOpen, Layers } from "lucide-react";
+import { X, Save, Settings, Plus, Edit2, Trash2, BookOpen, Layers } from "lucide-react";
 import { Chapter, PortalConfig } from "../types";
 import { triggerStarChime, MUSIC_PRESETS } from "./AmbientSoundscape";
 import { getDirectImageUrl } from "../firebase";
@@ -628,17 +628,7 @@ export default function SettingsModal({
             </div>
 
             {/* Bottom Actions BAR */}
-            <div className="p-5 border-t border-neutral-100 flex items-center justify-between bg-neutral-50/50">
-              <button
-                type="button"
-                onClick={handleResetAll}
-                disabled={isSaving}
-                className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-neutral-600 transition disabled:opacity-50 cursor-pointer"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                Derrubar para Originais
-              </button>
-
+            <div className="p-5 border-t border-neutral-100 flex items-center justify-end bg-neutral-50/50">
               <div className="flex gap-2">
                 <button
                   type="button"
